@@ -39,13 +39,13 @@ This repository contains a project on semantic segmentation using airbus ship de
 
 ### Model prediction result
 ##### Train data
-<img src="C:\Users\yevhe\PycharmProjects\WinStars-internship-project\results\validation\7fb130b9b.jpg"/>
-<img src="C:\Users\yevhe\PycharmProjects\WinStars-internship-project\results\validation\296e05e3d.jpg"/>
+<img src="results\validation\7fb130b9b.jpg"/>
+<img src="results\validation\296e05e3d.jpg"/>
 
 ##### Test data
-<img src="C:\Users\yevhe\PycharmProjects\WinStars-internship-project\results\inference\d2a2994fc.png"/>
-<img src="C:\Users\yevhe\PycharmProjects\WinStars-internship-project\results\inference\ff624dc46.png"/>
-<img src="C:\Users\yevhe\PycharmProjects\WinStars-internship-project\results\inference\31a1b6366.png"/>
+<img src="results\inference\d2a2994fc.png"/>
+<img src="results\inference\ff624dc46.png"/>
+<img src="results\inference\31a1b6366.png"/>
 
 ### Conclusion:
 Project was very challenging as I had 0 previous experience with neural networks and keras, but it was very fun nonetheless.
