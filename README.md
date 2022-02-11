@@ -51,9 +51,9 @@ Metric - f1-score, loss function - binary crossentropy.
 <img src="results\validation\e5cb861f3.jpg"/>
 
 ##### Inference example
-<img src="results\inference\3d75a5157.png"/>
-<img src="results\inference\582ed5b82.png"/>
-<img src="results\inference\d6cf01e6f.png"/>
+<img src="results\inference\3d75a5157.jpg"/>
+<img src="results\inference\582ed5b82.jpg"/>
+<img src="results\inference\d6cf01e6f.jpg"/>
 
 ### Project Structure:
 ```bash
