@@ -1,11 +1,10 @@
-import random
 import os
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 import tensorflow as tf
-from constants import ORIG_IMG_WIDTH, ORIG_IMG_HEIGHT, TRAIN_IMAGES_PATH, SEGMENTATION_MASKS_CSV_PATH
-from models.inference import custom_predict
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from constants import ORIG_IMG_WIDTH, ORIG_IMG_HEIGHT, TEST_IMAGES_PATH, IMG_WIDTH, IMG_HEIGHT
+from skimage import exposure
 
 
 def rle_decode(mask_rle, shape=(ORIG_IMG_WIDTH, ORIG_IMG_HEIGHT)):
@@ -29,6 +28,18 @@ def rle_decode(mask_rle, shape=(ORIG_IMG_WIDTH, ORIG_IMG_HEIGHT)):
     return img.reshape(shape).T
 
 
+def rle_encode(img):
+    '''
+    img: numpy array, 1 - mask, 0 - background
+    Returns run length as string formated
+    '''
+    pixels = img.flatten()
+    pixels = np.concatenate([[0], pixels, [0]])
+    runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
+    runs[1::2] -= runs[::2]
+    return ' '.join(str(x) for x in runs)
+
+
 def save_model_training_plot(model):
     # summarize history for f1-score
     plt.plot(model.history['f1-score'])
@@ -49,38 +60,6 @@ def save_model_training_plot(model):
     plt.savefig('results/train_val_history.png')
 
 
-# visualize predictions on train data
-def random_validation_predictions(model):
-    print('Visualizing random predictions.')
-    num_predictions = 10
-    # read csv to get segmentation masks
-    df = pd.read_csv(SEGMENTATION_MASKS_CSV_PATH)
-
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(10, 10))
-
-    # pick random pictures from train folder
-    images = os.listdir(TRAIN_IMAGES_PATH)
-    images = random.sample(images, num_predictions)
-
-    for img_name in images:
-        # load image
-        img = tf.keras.utils.load_img(os.path.join(TRAIN_IMAGES_PATH, img_name))
-        ax1.imshow(img)
-        ax1.set_title('Image: ' + img_name)
-
-        predicted_mask = custom_predict(model, img_name=img_name, test_data=False)
-        ax2.imshow(predicted_mask)
-        ax2.set_title('Prediction Masks')
-
-        ground_truth = create_mask(df, img_name)
-        ax3.imshow(ground_truth)
-        ax3.set_title('Ground Truth')
-
-        fig.savefig(f'results/validation/{img_name}', bbox_inches='tight', pad_inches=0.1)
-
-    print('Saved visualization to results folder.')
-
-
 # create mask from RLE strings
 def create_mask(df, img_name):
     # find rows in dataframe
@@ -92,3 +71,41 @@ def create_mask(df, img_name):
         final_mask += rle_decode(mask)
 
     return final_mask
+
+
+# apply contrast stretch to image
+def contrast_stretch(img):
+    p1, p99 = np.percentile(img, (0.1, 99.9))
+    img_rescale = exposure.rescale_intensity(img, in_range=(p1, p99))
+
+    return img_rescale
+
+
+# show 20 predicted masks from submission file
+def show_submission_images(show_submission=False):
+    if show_submission:
+        df = pd.read_csv('data/submission.csv')
+        rows = df.sample(20).values
+
+        for row in rows:
+            img_name = row[0]
+            rle = row[1]
+
+            img = tf.keras.utils.load_img(os.path.join(TEST_IMAGES_PATH, f'test_v2/{img_name}'))
+
+            mask = rle_decode(rle, shape=(IMG_WIDTH, IMG_HEIGHT))
+
+            # create subplot
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 10))
+
+            ax1.axis('off')
+            ax2.axis('off')
+            ax1.imshow(img)
+            ax1.set_title(f'Original image', fontsize=15)
+
+            ax2.imshow(mask)
+            ax2.set_title('Mask image', fontsize=15)
+
+            fig.savefig(f'results/submission/{img_name}', bbox_inches='tight', pad_inches=0.1)
+
+        print('Saved visualization of submission masks to results/submission folder.')

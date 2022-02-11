@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 .idea/
-data/
+data/test_v2
+data/train_v2
+data/masks_v2/*.jpg
