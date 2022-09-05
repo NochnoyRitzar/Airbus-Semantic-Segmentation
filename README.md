@@ -1,4 +1,4 @@
-# Internship task in Winstars
+# Airbus Semantic Segmentation using CNN
 
 ### Summary
 This repository contains a project on semantic segmentation using airbus ship detection dataset.
